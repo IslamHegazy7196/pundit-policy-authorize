@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   before_action :set_post, only: %i[ show edit update destroy ]
-
+  before_action :authenticate_user!,except: %i[index show]
+  before_action :authorize_user,except: %i[index show]
   # GET /posts or /posts.json
   def index
     @posts = Post.all
@@ -22,6 +23,7 @@ class PostsController < ApplicationController
   # POST /posts or /posts.json
   def create
     @post = Post.new(post_params)
+    # authorize @post
 
     respond_to do |format|
       if @post.save
@@ -66,5 +68,10 @@ class PostsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def post_params
       params.require(:post).permit(:title, :body, :published)
+    end
+
+    def authorize_user
+      post=@post || Post
+      authorize post
     end
 end
